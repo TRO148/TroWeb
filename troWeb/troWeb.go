@@ -24,5 +24,8 @@ func newContext(w http.ResponseWriter, req *http.Request) *Context {
 
 // newRouter 构造router
 func newRouter() *Router {
-	return &Router{handlers: make(map[string]HandlerFunc)}
+	return &Router{
+		roots:    make(map[string]*node),
+		handlers: make(map[string]HandlerFunc),
+	}
 }

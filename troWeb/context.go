@@ -15,12 +15,19 @@ type Context struct {
 	// 请求信息
 	Path   string
 	Method string
+	Params map[string]string
 
 	// 响应信息
 	StatusCode int
 }
 
-// PostForm 获取路由参数
+// Param 获取路由参数
+func (c *Context) Param(key string) string {
+	value, _ := c.Params[key]
+	return value
+}
+
+// PostForm 获取表单参数
 func (c *Context) PostForm(key string) string {
 	return c.Request.FormValue(key)
 }
