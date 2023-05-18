@@ -6,11 +6,11 @@ import (
 	"net/http"
 )
 
-// Context 包装
+// Context 上下文，包装原生的http.ResponseWriter和*http.Request
 type Context struct {
 	// 原生的参数
-	Writer http.ResponseWriter
-	Req    *http.Request
+	Writer  http.ResponseWriter
+	Request *http.Request
 
 	// 请求信息
 	Path   string
@@ -22,12 +22,12 @@ type Context struct {
 
 // PostForm 获取路由参数
 func (c *Context) PostForm(key string) string {
-	return c.Req.FormValue(key)
+	return c.Request.FormValue(key)
 }
 
 // Query 获取查询参数
 func (c *Context) Query(key string) string {
-	return c.Req.URL.Query().Get(key)
+	return c.Request.URL.Query().Get(key)
 }
 
 // Status 设置响应状态码
