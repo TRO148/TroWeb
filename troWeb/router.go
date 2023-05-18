@@ -5,8 +5,8 @@ import (
 	"strings"
 )
 
-// Router 路由，用于存储路由信息
-type Router struct {
+// router 路由，用于存储路由信息
+type router struct {
 	roots    map[string]*node
 	handlers map[string]HandlerFunc
 }
@@ -30,27 +30,27 @@ func parsePattern(pattern string) []string {
 }
 
 // addRoute 添加路由，存入路由树与handlers方法中
-func (router *Router) addRoute(method string, pattern string, handler HandlerFunc) {
+func (r *router) addRoute(method string, pattern string, handler HandlerFunc) {
 	parts := parsePattern(pattern)
 
 	//存入节点，以方法为树的基本节点
-	_, ok := router.roots[method]
+	_, ok := r.roots[method]
 	if !ok {
-		router.roots[method] = &node{}
+		r.roots[method] = &node{}
 	}
-	router.roots[method].insert(pattern, parts, 0)
+	r.roots[method].insert(pattern, parts, 0)
 
 	//存入处理函数
 	key := method + "-" + pattern
-	router.handlers[key] = handler
+	r.handlers[key] = handler
 }
 
 // getRoute 获取路由，查询节点与参数
-func (router *Router) getRoute(method string, path string) (*node, map[string]string) {
+func (r *router) getRoute(method string, path string) (*node, map[string]string) {
 	searchParts := parsePattern(path)
 	params := make(map[string]string)
 
-	root, ok := router.roots[method]
+	root, ok := r.roots[method]
 	if !ok {
 		return nil, nil
 	}
@@ -77,12 +77,12 @@ func (router *Router) getRoute(method string, path string) (*node, map[string]st
 }
 
 // handle 处理请求，根据请求方法+请求路径，从map中取出对应的处理函数，执行
-func (router *Router) handle(c *Context) {
-	n, params := router.getRoute(c.Method, c.Path)
+func (r *router) handle(c *Context) {
+	n, params := r.getRoute(c.Method, c.Path)
 	if n != nil {
 		c.Params = params
 		key := c.Method + "-" + n.pattern
-		router.handlers[key](c)
+		r.handlers[key](c)
 	} else {
 		c.String(http.StatusNotFound, "404 NOT FOUND: %s\n", c.Path)
 	}
