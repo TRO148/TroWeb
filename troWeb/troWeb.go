@@ -25,6 +25,7 @@ func newContext(w http.ResponseWriter, req *http.Request) *Context {
 		Request: req,
 		Path:    req.URL.Path,
 		Method:  req.Method,
+		index:   -1, //中间件
 	}
 }
 

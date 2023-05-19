@@ -2,6 +2,7 @@ package troWeb
 
 import (
 	"net/http"
+	"strings"
 )
 
 // Engine 实现ServeHTTP接口
@@ -49,6 +50,15 @@ func (engine *Engine) Run(addr string) (err error) {
 
 // ServeHTTP 用于ListenAndServe调用，实现ServeHTTP接口
 func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	var middlewares []HandlerFunc
+	for _, group := range engine.groups {
+		if strings.HasPrefix(req.URL.Path, group.prefix) {
+			//装填所有有关的中间件
+			middlewares = append(middlewares, group.middlewares...)
+		}
+	}
 	c := newContext(w, req)
+	// 赋值，用来调用Next()时，调用中间件，将组和上下文关联起来
+	c.handlers = middlewares
 	engine.r.handle(c)
 }

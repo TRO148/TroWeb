@@ -1,7 +1,6 @@
 package troWeb
 
 import (
-	"net/http"
 	"strings"
 )
 
@@ -76,14 +75,17 @@ func (r *router) getRoute(method string, path string) (*node, map[string]string)
 	return nil, nil
 }
 
-// handle 处理请求，根据请求方法+请求路径，从map中取出对应的处理函数，执行
+// handle 处理请求，根据请求方法+请求路径，从map中取出对应的处理函数，存入Context中
 func (r *router) handle(c *Context) {
 	n, params := r.getRoute(c.Method, c.Path)
 	if n != nil {
 		c.Params = params
 		key := c.Method + "-" + n.pattern
-		r.handlers[key](c)
+		c.handlers = append(c.handlers, r.handlers[key])
 	} else {
-		c.String(http.StatusNotFound, "404 NOT FOUND: %s\n", c.Path)
+		c.handlers = append(c.handlers, func(context *Context) {
+			context.String(404, "404 NOT FOUND: %s\n", context.Path)
+		})
 	}
+	c.Next()
 }

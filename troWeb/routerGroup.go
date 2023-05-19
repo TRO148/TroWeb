@@ -8,6 +8,11 @@ type routerGroup struct {
 	engine      *Engine       //所有分组使用同一个引擎
 }
 
+// Use 添加中间件
+func (group *routerGroup) Use(middlewares ...HandlerFunc) {
+	group.middlewares = append(group.middlewares, middlewares...)
+}
+
 // Group 添加新的分组
 // 所有分组使用同一个引擎
 func (group *routerGroup) Group(prefix string) *routerGroup {

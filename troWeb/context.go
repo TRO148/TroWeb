@@ -19,6 +19,27 @@ type Context struct {
 
 	// 响应信息
 	StatusCode int
+
+	//中间件
+	handlers []HandlerFunc
+	// index 用于记录当前执行到第几个中间件
+	index int
+}
+
+// Fail 报错
+func (c *Context) Fail(statusCode int, message string) {
+	c.index = len(c.handlers) - 1
+	c.JSON(statusCode, J{"message": message})
+}
+
+// Next 向下执行中间件
+// 当中间件调用Next()的时候，向后执行，然后再回来
+func (c *Context) Next() {
+	c.index++
+	s := len(c.handlers)
+	for ; c.index < s; c.index++ {
+		c.handlers[c.index](c)
+	}
 }
 
 // Param 获取路由参数
