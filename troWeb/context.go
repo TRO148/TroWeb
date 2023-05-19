@@ -24,6 +24,9 @@ type Context struct {
 	handlers []HandlerFunc
 	// index 用于记录当前执行到第几个中间件
 	index int
+
+	// engine指针
+	engine *Engine
 }
 
 // Fail 报错
@@ -95,9 +98,13 @@ func (c *Context) Data(code int, data []byte) {
 	c.Writer.Write(data)
 }
 
-// HTML 设置响应体
-func (c *Context) HTML(code int, html string) {
+// HTML 设置响应体,name为载入模板的项目名称，data为传入模板的数据
+func (c *Context) HTML(code int, name string, data interface{}) {
 	c.SetHeader("Content-Type", "text/html")
 	c.Status(code)
-	c.Writer.Write([]byte(html))
+	// 执行模板
+	err := c.engine.htmlTemplates.ExecuteTemplate(c.Writer, name, data)
+	if err != nil {
+		c.Fail(500, err.Error())
+	}
 }

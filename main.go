@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/TRO148/troWeb/troWeb"
 	"log"
-	"net/http"
 	"time"
 )
 
@@ -20,19 +19,7 @@ func onlyForV2() troWeb.HandlerFunc {
 
 func main() {
 	r := troWeb.New()
-	r.Use(troWeb.Logger()) // global midlleware
-	r.GET("/", func(c *troWeb.Context) {
-		c.HTML(http.StatusOK, "<h1>Hello Gee</h1>")
-	})
-
-	v2 := r.Group("/v2")
-	v2.Use(onlyForV2()) // v2 group middleware
-	{
-		v2.GET("/hello/:name", func(c *troWeb.Context) {
-			// expect /hello/troWebktutu
-			c.String(http.StatusOK, "hello %s, you're at %s\n", c.Param("name"), c.Path)
-		})
-	}
+	r.Static("/", "D:/Learn/TroWeb")
 
 	r.Run(":9999")
 }

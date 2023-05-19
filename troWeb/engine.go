@@ -1,6 +1,7 @@
 package troWeb
 
 import (
+	"html/template"
 	"net/http"
 	"strings"
 )
@@ -11,6 +12,19 @@ type Engine struct {
 	*routerGroup
 	groups []*routerGroup //所有分组，包含自己的分组
 	r      *router        //包含路由
+
+	htmlTemplates *template.Template //将所有模板加载进内存
+	funcMap       template.FuncMap   //自定义模板渲染函数
+}
+
+// SetFuncMap 自定义模板渲染函数
+func (engine *Engine) SetFuncMap(funcMap template.FuncMap) {
+	engine.funcMap = funcMap
+}
+
+// LoadHTMLGlob 加载模板文件
+func (engine *Engine) LoadHTMLGlob(pattern string) {
+	engine.htmlTemplates = template.Must(template.New("").Funcs(engine.funcMap).ParseGlob(pattern))
 }
 
 // 添加路由，将请求方法+请求路径作为key，处理函数作为value，存入map
@@ -60,5 +74,7 @@ func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	c := newContext(w, req)
 	// 赋值，用来调用Next()时，调用中间件，将组和上下文关联起来
 	c.handlers = middlewares
+	// 添加engine指针，用来调用engine的方法
+	c.engine = engine
 	engine.r.handle(c)
 }
