@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/TRO148/troWeb/troWeb"
 	"log"
+	"net/http"
 	"time"
 )
 
@@ -19,7 +20,9 @@ func onlyForV2() troWeb.HandlerFunc {
 
 func main() {
 	r := troWeb.New()
-	r.Static("/", "D:/Learn/TroWeb")
-
+	r.GET("/panic", func(c *troWeb.Context) {
+		names := []string{"geektutu"}
+		c.String(http.StatusOK, names[100])
+	})
 	r.Run(":9999")
 }

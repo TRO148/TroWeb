@@ -10,6 +10,13 @@ type J map[string]interface{}
 // HandlerFunc 处理函数 用于处理http请求
 type HandlerFunc func(*Context)
 
+// Default 默认引擎
+func Default() *Engine {
+	engine := New()
+	engine.Use(Logger(), Recovery())
+	return engine
+}
+
 // New 构造Engine
 func New() (engine *Engine) {
 	engine = &Engine{r: newRouter()}
